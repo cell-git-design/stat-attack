@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>STAT ATTACK — Daily BBL Cricket Stats Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="brand" id="logoHome">
+        <span class="brand-badge">BBL</span>
+        <h1>STAT<span>ATTACK</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="soundToggle" class="icon-btn" aria-label="Toggle Sound" title="Toggle Sound">🔊</button>
+        <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard" title="Global Leaderboard">🏆</button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: HOME / LOBBY -->
+    <main id="homeScreen" class="screen active">
+      <div class="hero-card">
+        <p class="eyebrow">DAILY CRICKET ESTIMATION</p>
+        <h2>HOW WELL DO YOU KNOW THE BIG BASH?</h2>
+        <p class="subtitle">Guess the exact BBL stat before the 12s shot clock hits zero. Closer + faster = max 1,000 pts.</p>
+
+        <div class="streak-bar" id="streakDisplay">
+          <span>🔥 Daily Streak: <strong id="streakCount">0</strong></span>
+          <span>⭐ Best Daily: <strong id="bestDailyScore">0</strong></span>
+        </div>
+
+        <div class="input-group">
+          <label for="nicknameInput">PLAYER NICKNAME</label>
+          <input type="text" id="nicknameInput" maxlength="16" placeholder="e.g. Maxi154" autocomplete="off" />
+        </div>
+
+        <div class="mode-buttons">
+          <button id="startDailyBtn" class="btn btn-primary">
+            <div class="btn-text">
+              <span class="btn-title">DAILY CHALLENGE</span>
+              <span class="btn-sub">7 Questions • Same for everyone</span>
+            </div>
+            <span class="btn-arrow">→</span>
+          </button>
+
+          <button id="startSuperOverBtn" class="btn btn-secondary">
+            <div class="btn-text">
+              <span class="btn-title">SUPER OVER</span>
+              <span class="btn-sub">6 Random Questions • Unlimited Play</span>
+            </div>
+            <span class="btn-arrow">⚡</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="demoBanner" class="demo-banner hidden">
+        ⚡ Running in Local Demo Mode. Add Supabase keys in <code>config.js</code> for live global leaderboards.
+      </div>
+    </main>
+
+    <!-- SCREEN 2: ACTIVE GAMEPLAY -->
+    <section id="gameScreen" class="screen">
+      <div class="hud">
+        <div class="hud-pill">
+          <span class="hud-label">BALL</span>
+          <span id="questionCounter" class="hud-val">1/7</span>
+        </div>
+        <div class="timer-ring-wrap">
+          <div id="timerDisplay" class="timer-display">12.0</div>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">SCORE</span>
+          <span id="liveScore" class="hud-val accent">0</span>
+        </div>
+      </div>
+
+      <!-- Dynamic Timer Progress Bar -->
+      <div class="timer-track">
+        <div id="timerBar" class="timer-fill"></div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="question-card" id="questionCard">
+        <div class="q-tags">
+          <span id="qCategory" class="tag">PLAYER</span>
+          <span id="qDifficulty" class="tag tag-diff">MEDIUM</span>
+        </div>
+        <h3 id="questionPrompt" class="q-prompt">Loading statistic...</h3>
+
+        <!-- Guess Input Form -->
+        <form id="guessForm" class="guess-area">
+          <div class="number-input-wrap">
+            <input
+              type="number"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="guessInput"
+              placeholder="0"
+              required
+              autocomplete="off"
+            />
+            <span id="unitLabel" class="unit-label">RUNS</span>
+          </div>
+          <button type="submit" id="lockGuessBtn" class="btn btn-primary btn-block">LOCK IN GUESS</button>
+        </form>
+      </div>
+
+      <!-- Animated Answer Reveal Drawer -->
+      <div id="revealCard" class="reveal-card hidden">
+        <div class="reveal-header">
+          <span id="revealBadge" class="reveal-badge">SPOT ON!</span>
+          <span id="revealPoints" class="reveal-points">+940 PTS</span>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="comp-box">
+            <span class="comp-label">YOUR GUESS</span>
+            <span id="userGuessDisplay" class="comp-num">150</span>
+          </div>
+          <div class="comp-box actual">
+            <span class="comp-label">ACTUAL STAT</span>
+            <span id="actualAnswerDisplay" class="comp-num">154</span>
+          </div>
+        </div>
+
+        <p id="explanationText" class="explanation"></p>
+
+        <button id="nextQuestionBtn" class="btn btn-primary btn-block">NEXT DELIVERY →</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: FINAL SUMMARY & SHARE -->
+    <section id="summaryScreen" class="screen">
+      <div class="summary-card">
+        <p id="summaryModeLabel" class="eyebrow">DAILY CHALLENGE COMPLETE</p>
+        <div class="final-score-wrap">
+          <span id="finalScoreDisplay" class="final-score">0</span>
+          <span id="maxScoreDisplay" class="max-score">/ 7,000</span>
+        </div>
+
+        <div id="emojiGrid" class="emoji-grid"></div>
+
+        <div class="share-actions">
+          <button id="nativeShareBtn" class="btn btn-primary btn-block">📲 SHARE RESULT WITH MATES</button>
+          <button id="copyShareBtn" class="btn btn-secondary btn-block">📋 COPY SCORE CARD</button>
+        </div>
+
+        <div class="summary-nav">
+          <button id="viewBoardFromSummary" class="link-btn">View Global Leaderboard 🏆</button>
+          <button id="playAgainBtn" class="link-btn">Back to Lobby</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: GLOBAL LEADERBOARD -->
+    <section id="leaderboardScreen" class="screen">
+      <div class="lb-card">
+        <div class="lb-header">
+          <h2>GLOBAL STANDINGS</h2>
+          <button id="closeLbBtn" class="icon-btn">✕</button>
+        </div>
+
+        <div class="lb-tabs">
+          <button class="lb-tab active" data-mode="daily">Today's Daily</button>
+          <button class="lb-tab" data-mode="super_over">Super Over All-Time</button>
+        </div>
+
+        <div id="leaderboardList" class="lb-list">
+          <p class="loading-text">Loading standings...</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
